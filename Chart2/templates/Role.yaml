@@ -19,7 +19,7 @@ rule:
     # sign the CSR to get certificate:  openssl x509 -req -in emp.csr -CA /path/to/ca.crt /path/to/ca.key -CAcreateserial -out emp.crt -days 365
 
     #set context and credentials:  kubectl config set-credentials emp --client-certificate=emp.crt --client-key=emp.key
-                                   kubectl config set-context dev-ctx --cluster=minikube --namespace=dev --user=emp
+     #                              kubectl config set-context dev-ctx --cluster=minikube --namespace=dev --user=emp
 
                                    # create role > rolebindings
 
