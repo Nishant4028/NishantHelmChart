@@ -3,9 +3,9 @@ entries:
   Chart2:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2025-06-15T20:59:22.8958718+05:30"
+    created: "2025-06-15T23:48:21.6718758+05:30"
     description: A chart for wings1
-    digest: 6c349d67e6af6a2a2420c5ffd90d428c8d9d9aaa1c3d82571741e5b435d4300a
+    digest: 00b75504698be1359c7a6589190a5d2000b2c3efcecb179dacb4b3d5fb4bdb07
     name: Chart2
     type: application
     urls:
@@ -14,7 +14,7 @@ entries:
   Nishant1chart:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2025-06-15T20:59:22.8982595+05:30"
+    created: "2025-06-15T23:48:21.6718758+05:30"
     description: A Helm chart for learning Helm Basics
     digest: d9368986d345c6fe4d5e2c53739d0f2717fdbc671716cc2119efd90bcbaa983e
     name: Nishant1chart
@@ -22,4 +22,4 @@ entries:
     urls:
     - Nishant1chart/Nishant1chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-15T20:59:22.8928554+05:30"
+generated: "2025-06-15T23:48:21.6713021+05:30"

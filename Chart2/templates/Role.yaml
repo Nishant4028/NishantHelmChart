@@ -1,16 +1,17 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-   name: emp-role 
-   namespace: dev
+  name: emp-role
+  namespace: dev
 rules:
   - apiGroups: [""]
-    resources: ["Pods"]
-    verbs: ["get","list"]
-  - apiGroups: [""]
-    resources: ["Deployments"]
-    verbs: ["get","list"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list"]
 
+# see in CSR file
     # create a new user <emp>
     # create a private key:    openssl genrsa -out emp.key 2048
     # create a CSR :    openssl req -new -key emp.key -out emp.csr -subj "/CN=emp/O=dev"

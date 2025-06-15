@@ -1,3 +1,10 @@
+# note kubectl is get at latest level so usking minikube's kubectl 
+# >> alias kubectl="minikube kubectl --"
+
+
+
+# create dev namespace
+
 # create a private key for user
 # >>   openssl genrsa -out emp.key 2048
 #this will generate a 2048-bit RSA private key save as emp.key
@@ -23,6 +30,7 @@ spec:
        - client auth
 
 # base64 replace with above-one
+# kubectl apply -f filename
 
 # approve the CSR
 #> kubectl  certificate approve emp          
@@ -33,12 +41,14 @@ spec:
 # >> kubectl  get csr emp -o jsonpath='{.status.certificate}' | base64 --decode > emp.crt
 # this extract the signed certificate from the CSR object> it will decode and saves it as emp.crt
 
-# create k8s credential for User emp
-#>  kubectl config set credentials emp --client-key=emp.key --client-certificate=emp.crt --embed-certs=true
+# create k8s credential for User emp kubectl config set-credentials emp --client-key=emp.key --client-certificate=emp.crt --embed-certs=true
+#> 
 # this command register the user in the kubeconfig using key and certificate
 
 # create new context name dev-ctx
 # kubectl config set-context dev-ctx --cluster=minikube --namespace=dev --user=emp
 # creates new context 
-
 # create role and rolebindings
+# kubectl --context=dev-ctx run nginx --image=nginx   > can't create because gave only get and list access
+# verify> kubectl --context=dev-ctx get pods -o wide
+#  kubectl --context=dev-ctx get pods -n default    >> can't access because no permission 
