@@ -3,7 +3,7 @@ kind: Role
 metadata:
    name: emp-role 
    namespace: dev
-rule:
+rules:
   - apiGroups: [""]
     resources: ["Pods"]
     verbs: ["get","list"]

@@ -1,0 +1,44 @@
+# create a private key for user
+# >>   openssl genrsa -out emp.key 2048
+#this will generate a 2048-bit RSA private key save as emp.key
+
+# create a Certificate Singing request 
+#>>   openssl req -new -key emp.key -out emp.csr -subj "/CN=emp/O=dev"
+# CN=emp is comman name(username)
+# O=dev is the Organization(Group name)
+
+# Base64 encode the CSR
+# >>  cat emp.csr | base64 | tr -d '\n'
+
+
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+     name: emp
+spec: 
+    request: <Base64_encoded_csr>
+    signerName: kubernetes.io/kube-apiserver-client
+    expirationSeconds: 31536000
+    usages:
+       - client auth
+
+# base64 replace with above-one
+
+# approve the CSR
+#> kubectl  certificate approve emp          
+#> once approved this will generate a signed certicate for user
+# 
+
+#retrive the signed certificate
+# >> kubectl  get csr emp -o jsonpath='{.status.certificate}' | base64 --decode > emp.crt
+# this extract the signed certificate from the CSR object> it will decode and saves it as emp.crt
+
+# create k8s credential for User emp
+#>  kubectl config set credentials emp --client-key=emp.key --client-certificate=emp.crt --embed-certs=true
+# this command register the user in the kubeconfig using key and certificate
+
+# create new context name dev-ctx
+# kubectl config set-context dev-ctx --cluster=minikube --namespace=dev --user=emp
+# creates new context 
+
+# create role and rolebindings

@@ -1,5 +1,5 @@
 apiVersion: v2
-name: chart2
+name: Chart2
 description: A chart for wings1
 type: application
 version: 0.1.0
