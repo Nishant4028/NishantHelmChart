@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  Nishant1chart:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-06-15T08:32:06.0374819+05:30"
+    description: A Helm chart for learning Helm Basics
+    digest: f62326b15087351515ea48b401a598528dee340b183acffbabdf1308e0b7486d
+    name: Nishant1chart
+    type: application
+    urls:
+    - Nishant1chart/Nishant1chart-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-06-15T08:32:06.0369371+05:30"
