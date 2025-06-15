@@ -19,3 +19,5 @@ spec:
         image: ghcr.io/stacksimplify/kubenginx:4.0.0
         ports:
         - containerPort: 80
+
+#hello nishant hu me
