@@ -1,7 +1,3 @@
-
-		
-		
-		
 #- name: Register ECS Task Definition
 #  hosts: localhost
 #  vars:
@@ -191,7 +187,7 @@
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
-     name: emp
+     name: emp222
 spec: 
     request: <Base64_encoded_csr>
     signerName: kubernetes.io/kube-apiserver-client
