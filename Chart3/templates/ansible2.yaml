@@ -1,0 +1,41 @@
+# --- Ansible Playbook: Build and Push Docker Image to ECR ---
+# - name: Build and Push Docker Image to ECR
+#   hosts: localhost
+#   vars:
+#     aws_region: "ap-south-1"
+#     ecr_repo_url: "123456789012.dkr.ecr.ap-south-1.amazonaws.com"
+#     image_name: "flask-image"
+#     image_tag: "latest"
+#     aws_access_key: "<access_key>"
+#     aws_secret_key: "<secret>"
+#
+#   tasks:
+#     - name: Build Docker image
+#       community.docker.docker_image:
+#         name: "[[ image_name ]]"
+#         tag: "[[ image_tag ]]"
+#         build:
+#           path: "."
+#
+#     - name: Login to AWS ECR
+#       community.docker.docker_login:
+#         registry_url: "[[ ecr_repo_url ]]"
+#         username: "AWS"
+#         password: "[[ aws_secret_key ]]"
+#       environment:
+#         AWS_ACCESS_KEY_ID: "[[ aws_access_key ]]"
+#         AWS_SECRET_ACCESS_KEY: "[[ aws_secret_key ]]"
+#         AWS_DEFAULT_REGION: "[[ aws_region ]]"
+#
+#     - name: Tag Docker image
+#       ansible.builtin.command:
+#         cmd: docker tag [[ image_name ]]:[[ image_tag ]] [[ ecr_repo_url ]]/[[ image_name ]]:[[ image_tag ]]
+#
+#     - name: Push Docker image to ECR
+#       ansible.builtin.command:
+#         cmd: docker push [[ ecr_repo_url ]]/[[ image_name ]]:[[ image_tag ]]
+# --- End of Ansible Playbook ---
+# ansible-galaxy collection install amazon.aws
+# ansible-galaxy collection install community.docker
+# sudo usermod -aG docker $USER
+# newgrp docker
