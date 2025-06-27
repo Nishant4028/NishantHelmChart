@@ -19,30 +19,21 @@
 #            portMappings:
 #              - containerPort: 5000
 #                hostPort: 5000
-				
-				
+#---								
 #Dockerfile
 
 #FROM python:3.7-alpine
 #WORKDIR /app
 #COPY . /app
-
 #RUN pip install --no-cache-dir -r requirements.txt
-
 #CMD ["python", "app.py"]
-			
-			
+#---			
 #aws configure
 #key and secret 
-
 #aws sts get-caller-identity
-
 #copy arn use in ansible
-
-
+#---
 # flask-repo.yaml
-
-
 #- name: Register ECS Task Definition
 #  hosts: localhost
 #  gather_facts: false
@@ -69,23 +60,17 @@
 #              - containerPort: 5000
 #                hostPort: 5000
 #        state: present
-		
-
-#app.py
-		
+#---
+#app.py---		
 #from flask import Flask
 #app = Flask(__name__)  # Use double underscores
-
 #@app.route("/")
 #def hello():
 #    return "Flask application deployed successfully"
-
 #if __name__ == "__main__":  # Also use double underscores here
  #   app.run(host='0.0.0.0')
-
-
-#flask-repo.yaml	
-	
+#---
+#flask-repo.yaml---	
 #- name: Build and push Docker image to ECR
 #  hosts: localhost
 #  gather_facts: false
@@ -95,15 +80,13 @@
 #    repo_name: flaskdeployment-repository
 #    region: ap-south-1
 #  tasks:
-
 #    - name: Build Docker image locally
 #      community.docker.docker_image:
 #        name: "{{ image_name }}"
 #        tag: latest
 #        build:
 #          path: .
-
-#   - name: Get ECR login password and authenticate Docker
+#    - name: Get ECR login password and authenticate Docker
 #      shell: >
 #        aws ecr get-login-password --region {{ region }} |
 #        docker login --username AWS --password-stdin $(aws ecr describe-repositories
@@ -111,7 +94,6 @@
 #        --region {{ region }}
 #        --query 'repositories[0].repositoryUri'
 #        --output text)
-
 #    - name: Tag Docker image with final name
 #      shell: >
 #        docker tag {{ image_name }}:latest
@@ -120,7 +102,6 @@
 #        --region {{ region }}
 #        --query 'repositories[0].repositoryUri'
 #        --output text):{{ final_tag.split(':')[1] }}
-
 #    - name: Push Docker image to ECR
 #      shell: >
 #        docker push
@@ -129,10 +110,8 @@
 #        --region {{ region }}
 #        --query 'repositories[0].repositoryUri'
 #        --output text):{{ final_tag.split(':')[1] }}
-		
-		
-#flask-container.yaml		
-		
+#---		
+#flask-container.yaml---				
 #- name: Register task definition and run ECS task for Flask app
 #  hosts: localhost
 #  gather_facts: false
@@ -147,7 +126,6 @@
 #    subnet_id: "<your-subnet-id>"                  # Replace with actual subnet ID
 #    security_group: "<your-security-group-id>"     # Replace with a SG that allows port 5000
 #  tasks:
-
 #    - name: Task 1 — Register ECS Task Definition
 #      community.aws.ecs_taskdefinition:
 #        family: "{{ task_family }}"
@@ -164,7 +142,6 @@
 #              - containerPort: 5000
 #                hostPort: 5000
 #        state: present
-
 #    - name: Task 2 — Run ECS Task using EC2 launch type
 #      community.aws.ecs_task:
 #        cluster: "{{ cluster_name }}"
@@ -183,7 +160,7 @@
 #            assign_public_ip: ENABLED
 #        started_by: ansible
 #        state: started
-
+#---
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
