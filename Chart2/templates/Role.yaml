@@ -27,3 +27,25 @@ rules:
 # kubectl --context=dev-ctx run nginx --image=nginx --restart=Never --namespace=dev
 # kubectl --context=dev-ctx get pods -o wide
 # kubectl --context=dev-ctx get pods -n default  >> return forbidden
+
+---
+# Cluster role
+
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: read-only-clusterrole
+rules:
+  - apiGroups: [""]  # "" indicates the core API group
+    resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "clusterroles"]
+    verbs: ["get", "list", "watch"]

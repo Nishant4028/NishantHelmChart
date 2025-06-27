@@ -52,3 +52,9 @@ spec:
 # kubectl --context=dev-ctx run nginx --image=nginx   > can't create because gave only get and list access
 # verify> kubectl --context=dev-ctx get pods -o wide
 #  kubectl --context=dev-ctx get pods -n default    >> can't access because no permission 
+
+# mvn archetype:generate -DgroupId=com.java.javaApp -DartifactId=maven-project -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+# mvn validate mvn clean mvn compile mvn test mvn package mvn verify mvn install mvn deploy
+
+# java -cp target/maven-project-1.0-SNAPSHOT.jar com.java.javaApp.App

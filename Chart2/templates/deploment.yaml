@@ -1,0 +1,162 @@
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_MODE: "production"
+  LOG_LEVEL: "debug"
+---
+# Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+data:
+  DB_PASSWORD: bXlTZWNyZXRQYXNz # "mySecretPass" base64 encoded
+---
+# PersistentVolume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-demo
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+# PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# kubectl label nodes <node-name> disktype=ssd zone=zone-a
+# kubectl taint nodes <node-name> workload=devops:NoSchedule
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduled-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: scheduled-app
+  template:
+    metadata:
+      labels:
+        app: scheduled-app
+    spec:
+      nodeSelector:
+        disktype: ssd
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype
+                operator: In
+                values:
+                - ssd
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: zone
+                operator: In
+                values:
+                - zone-a
+                - zone-b
+      tolerations:
+      - key: "workload"
+        operator: "Equal"
+        value: "devops"
+        effect: "NoSchedule"
+      containers:
+      - name: my-nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: APP_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: APP_MODE
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: DB_PASSWORD
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+        - name: data-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: pvc-demo
+---
+# HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-scheduled-deployment
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: scheduled-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduled-app-service
+  labels:
+    app: scheduled-app
+    tier: backend
+    environment: production
+  annotations:
+    service.kubernetes.io/name: "Scheduled App Service"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+spec:
+  selector:
+    app: scheduled-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80           # The port exposed by the service
+    targetPort: 80     # The port the container is listening on
+  type: ClusterIP     # NodePort  ClusteIP LoadBalancer
+  sessionAffinity: None
+ # ipFamilies:
+ # - IPv4
+ # internalTrafficPolicy: Cluster
+ # allocateLoadBalancerNodePorts: false
