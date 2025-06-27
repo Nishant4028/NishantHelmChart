@@ -88,28 +88,28 @@
 #          path: .
 #    - name: Get ECR login password and authenticate Docker
 #      shell: >
-#        aws ecr get-login-password --region {{ region }} |
+#        aws ecr get-login-password --region "{{`{{region }}`}}" |     ##withoutdoubleequate
 #        docker login --username AWS --password-stdin $(aws ecr describe-repositories
-#        --repository-names {{ repo_name }} 
-#        --region {{ region }}
+#        --repository-names "{{`{{ repo_name }}`}}"  ##withoutdoubleequate
+#        --region  "{{`{{ region }}`}}"    ##withoutdoubleequate
 #        --query 'repositories[0].repositoryUri'
 #        --output text)
 #    - name: Tag Docker image with final name
 #      shell: >
-#        docker tag {{ image_name }}:latest
+#        docker tag"{{`{{ image_name }}`}}":latest    ##withoutdoubleequate
 #        $(aws ecr describe-repositories
-#        --repository-names {{ repo_name }}
-#        --region {{ region }}
+#        --repository-names "{{`{{ repo_name }}`}}"  ##withoutdoubleequate
+#        --region "{{`{{ region  }}`}}"    ##withoutdoubleequate
 #        --query 'repositories[0].repositoryUri'
-#        --output text):{{ final_tag.split(':')[1] }}
+#        --output text): "{{`{{ final_tag.split(':')[1] }}`}}"   ##withoutdoubleequate
 #    - name: Push Docker image to ECR
 #      shell: >
 #        docker push
 #        $(aws ecr describe-repositories
-#        --repository-names {{ repo_name }}
-#        --region {{ region }}
+#        --repository-names  "{{`{{ repo_name }}`}}"    ##withoutdoubleequate
+#        --region "{{`{{  region }}`}}"      ##withoutdoubleequate
 #        --query 'repositories[0].repositoryUri'
-#        --output text):{{ final_tag.split(':')[1] }}
+#        --output text): "{{`{{ final_tag.split(':')[1] }}`}}"      ##withoutdoubleequate
 #---		
 #flask-container.yaml---				
 #- name: Register task definition and run ECS task for Flask app
