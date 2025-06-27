@@ -7,12 +7,12 @@
 #  tasks:
 #    - name: Register Task Definition
 #      community.aws.ecs_taskdefinition:
-#        family: "{{ task_family }}"
+#        family:  "{{`{{ task_family  }}`}}"
 #        network_mode: bridge
 #        requires_compatibilities: ["EC2"]
 #        container_definitions:
-#         - name: "{{ container_name }}"
-#            image: "{{ image_uri }}"
+#         - name: "{{`{{ container_name }}`}}"
+#            image:  "{{`{{ image_uri }}`}}"
 #            memory: 512
 #            cpu: 256
 #            essential: true
@@ -46,15 +46,15 @@
 #  tasks:
 #    - name: Register ECS task definition
 #      community.aws.ecs_taskdefinition:
-#        family: "{{ task_family }}"
+#        family: "{{`{{ task_family}}`}}"
 #        network_mode: bridge
 #       requires_compatibilities: ["EC2"]
 #        cpu: "256"
 #       memory: "512"
 #        execution_role_arn: "arn:aws:iam::<your-account-id>:role/ecsTaskExecutionRole"
 #        container_definitions:
-#          - name: "{{ container_name }}"
-#            image: "{{ image_uri }}"
+#          - name: "{{`{{ container_name }}`}}"
+#            image: "{{`{{ image_uri }}`}}"
 #            essential: true
 #            portMappings:
 #              - containerPort: 5000
@@ -82,7 +82,7 @@
 #  tasks:
 #    - name: Build Docker image locally
 #      community.docker.docker_image:
-#        name: "{{ image_name }}"
+#        name: "{{`{{ image_name }}`}}"
 #        tag: latest
 #        build:
 #          path: .
@@ -90,7 +90,7 @@
 #      shell: >
 #        aws ecr get-login-password --region {{ region }} |
 #        docker login --username AWS --password-stdin $(aws ecr describe-repositories
-#        --repository-names {{ repo_name }}
+#        --repository-names {{ repo_name }} 
 #        --region {{ region }}
 #        --query 'repositories[0].repositoryUri'
 #        --output text)
@@ -128,35 +128,35 @@
 #  tasks:
 #    - name: Task 1 — Register ECS Task Definition
 #      community.aws.ecs_taskdefinition:
-#        family: "{{ task_family }}"
+#        family: "{{`{{ task_family }}`}}"
 #        network_mode: bridge
 #        requires_compatibilities: [EC2]
 #        cpu: "256"
 #        memory: "512"
-#        execution_role_arn: "{{ execution_role_arn }}"
+#        execution_role_arn: "{{`{{ execution_role_arn}}`}}"
 #        container_definitions:
-#          - name: "{{ container_name }}"
-#            image: "{{ image_uri }}"
-#            essential: true
+#          - name: "{{`{{ container_name }}`}}"
+#            image: "{{`{{ image_uri }}`}}"
+#            essential: true 
 #            portMappings:
 #              - containerPort: 5000
 #                hostPort: 5000
 #        state: present
 #    - name: Task 2 — Run ECS Task using EC2 launch type
 #      community.aws.ecs_task:
-#        cluster: "{{ cluster_name }}"
-#        task_definition: "{{ task_family }}"
+#        cluster: "{{`{{ cluster_name }}`}}"
+#        task_definition: "{{`{{ task_family}}`}}"
 #        launch_type: EC2
 #        count: 1
 #       overrides:
 #          containerOverrides:
-#            - name: "{{ container_name }}"
+#            - name: "{{`{{ container_name }}`}}"
 #        network_configuration:
 #          awsvpc_configuration:
 #            subnets:
-#              - "{{ subnet_id }}"
+#              -  "{{`{{ subnet_id }}`}}"
 #            security_groups:
-#              - "{{ security_group }}"
+#              -  "{{`{{ security_group }}`}}"
 #            assign_public_ip: ENABLED
 #        started_by: ansible
 #        state: started
