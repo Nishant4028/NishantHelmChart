@@ -1,0 +1,190 @@
+
+		
+		
+		
+- name: Register ECS Task Definition
+  hosts: localhost
+  vars:
+    task_family: task-family-ecs
+    container_name: flask-app-container
+    image_uri: "<your-ecr-uri>:latest"  # replace with actual URI
+  tasks:
+    - name: Register Task Definition
+      community.aws.ecs_taskdefinition:
+        family: "{{ task_family }}"
+        network_mode: bridge
+        requires_compatibilities: ["EC2"]
+        container_definitions:
+          - name: "{{ container_name }}"
+            image: "{{ image_uri }}"
+            memory: 512
+            cpu: 256
+            essential: true
+            portMappings:
+              - containerPort: 5000
+                hostPort: 5000
+				
+				
+#Dockerfile
+
+#FROM python:3.7-alpine
+
+#WORKDIR /app
+#COPY . /app
+
+#RUN pip install --no-cache-dir -r requirements.txt
+
+#CMD ["python", "app.py"]
+			
+			
+#aws configure
+#key and secret 
+
+#aws sts get-caller-identity
+
+#copy arn use in ansible
+
+
+# flask-repo.yaml
+
+
+- name: Register ECS Task Definition
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - community.aws
+  vars:
+    task_family: flask-task
+    container_name: flask-container
+    image_uri: "<your-ecr-uri>:latest"
+  tasks:
+    - name: Register ECS task definition
+      community.aws.ecs_taskdefinition:
+        family: "{{ task_family }}"
+        network_mode: bridge
+        requires_compatibilities: ["EC2"]
+        cpu: "256"
+        memory: "512"
+        execution_role_arn: "arn:aws:iam::<your-account-id>:role/ecsTaskExecutionRole"
+        container_definitions:
+          - name: "{{ container_name }}"
+            image: "{{ image_uri }}"
+            essential: true
+            portMappings:
+              - containerPort: 5000
+                hostPort: 5000
+        state: present
+		
+
+#app.py
+		
+#from flask import Flask
+#app = Flask(__name__)  # Use double underscores
+
+#@app.route("/")
+#def hello():
+#    return "Flask application deployed successfully"
+
+#if __name__ == "__main__":  # Also use double underscores here
+ #   app.run(host='0.0.0.0')
+
+
+#flask-repo.yaml	
+	
+- name: Build and push Docker image to ECR
+  hosts: localhost
+  gather_facts: false
+  vars:
+    image_name: flask-image
+    final_tag: flaskapp:latest
+    repo_name: flaskdeployment-repository
+    region: ap-south-1
+  tasks:
+
+    - name: Build Docker image locally
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        tag: latest
+        build:
+          path: .
+
+    - name: Get ECR login password and authenticate Docker
+      shell: >
+        aws ecr get-login-password --region {{ region }} |
+        docker login --username AWS --password-stdin $(aws ecr describe-repositories
+        --repository-names {{ repo_name }}
+        --region {{ region }}
+        --query 'repositories[0].repositoryUri'
+        --output text)
+
+    - name: Tag Docker image with final name
+      shell: >
+        docker tag {{ image_name }}:latest
+        $(aws ecr describe-repositories
+        --repository-names {{ repo_name }}
+        --region {{ region }}
+        --query 'repositories[0].repositoryUri'
+        --output text):{{ final_tag.split(':')[1] }}
+
+    - name: Push Docker image to ECR
+      shell: >
+        docker push
+        $(aws ecr describe-repositories
+        --repository-names {{ repo_name }}
+        --region {{ region }}
+        --query 'repositories[0].repositoryUri'
+        --output text):{{ final_tag.split(':')[1] }}
+		
+		
+#flask-container.yaml		
+		
+- name: Register task definition and run ECS task for Flask app
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - community.aws
+  vars:
+    task_family: task-family-ecs
+    container_name: flask-app-container
+    image_uri: "<your-ecr-uri>:latest"             # Replace with your actual ECR image URI
+    execution_role_arn: "arn:aws:iam::<your-account-id>:role/ecsTaskExecutionRole"
+    cluster_name: flaskcontainer-cluster
+    subnet_id: "<your-subnet-id>"                  # Replace with actual subnet ID
+    security_group: "<your-security-group-id>"     # Replace with a SG that allows port 5000
+  tasks:
+
+    - name: Task 1 — Register ECS Task Definition
+      community.aws.ecs_taskdefinition:
+        family: "{{ task_family }}"
+        network_mode: bridge
+        requires_compatibilities: [EC2]
+        cpu: "256"
+        memory: "512"
+        execution_role_arn: "{{ execution_role_arn }}"
+        container_definitions:
+          - name: "{{ container_name }}"
+            image: "{{ image_uri }}"
+            essential: true
+            portMappings:
+              - containerPort: 5000
+                hostPort: 5000
+        state: present
+
+    - name: Task 2 — Run ECS Task using EC2 launch type
+      community.aws.ecs_task:
+        cluster: "{{ cluster_name }}"
+        task_definition: "{{ task_family }}"
+        launch_type: EC2
+        count: 1
+        overrides:
+          containerOverrides:
+            - name: "{{ container_name }}"
+        network_configuration:
+          awsvpc_configuration:
+            subnets:
+              - "{{ subnet_id }}"
+            security_groups:
+              - "{{ security_group }}"
+            assign_public_ip: ENABLED
+        started_by: ansible
+        state: started
